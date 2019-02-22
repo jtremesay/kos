@@ -8,7 +8,7 @@ QEMU = qemu-system-x86_64
 
 TARGET = kernel/kos.bin
 ASM_SOURCES = kernel/boot.s
-CPP_SOURCES = kernel/kernel.cpp kernel/string.cpp kernel/terminal.cpp kernel/vga.cpp
+CPP_SOURCES = kernel/main.cpp kernel/string.cpp kernel/terminal.cpp kernel/vga.cpp
 OBJECTS = $(patsubst %.cpp,%.o,$(CPP_SOURCES)) $(patsubst %.s,%.o,$(ASM_SOURCES))
 
 all: $(TARGET)
