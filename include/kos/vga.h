@@ -2,9 +2,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * Width of the VGA screen
+ */
 extern const size_t VGA_WIDTH;
+
+/**
+ * Height of the VGA screen
+ */
 extern const size_t VGA_HEIGHT;
 
+/**
+ * Palette of VGA colors
+ */
 enum VGA_COLOR {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,

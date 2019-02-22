@@ -6,7 +6,7 @@ TerminalContext::TerminalContext() :
     _row(0),
     _column(0),
     _color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK)),
-    _buffer(reinterpret_cast<uint16_t *>(0xB8000))
+    _buffer(reinterpret_cast<uint16_t *>(0xB8000)) // Address of the VGA buffer
 {
     this->clear();
 }
