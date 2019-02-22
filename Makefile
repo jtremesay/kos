@@ -6,21 +6,37 @@ CXXFLAGS = -nostdlib -std=c++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions
 INCLUDES = -I include
 QEMU = qemu-system-x86_64
 
-TARGET = kernel/kos.bin
+BUILD_DIR = build
+TARGET = kos.bin
 ASM_SOURCES = kernel/boot.s
 CPP_SOURCES = kernel/main.cpp kernel/string.cpp kernel/terminal.cpp kernel/vga.cpp
-OBJECTS = $(patsubst %.cpp,%.o,$(CPP_SOURCES)) $(patsubst %.s,%.o,$(ASM_SOURCES))
+OBJECTS = $(ASM_SOURCES:%.s=$(BUILD_DIR)/%.o) $(CPP_SOURCES:%.cpp=$(BUILD_DIR)/%.o)
+DEPENDENCIES = $(OBJECTS:%.o=%.d)
 
 all: $(TARGET)
 	
-qemu: $(TARGET)
+qemu: $(BUILD_DIR)/$(TARGET)
 	$(QEMU) -kernel $<
 
-$(TARGET): kernel/linker.ld $(OBJECTS)
+
+$(TARGET): $(BUILD_DIR)/$(TARGET)
+
+$(BUILD_DIR)/$(TARGET): kernel/linker.ld $(OBJECTS)
+	mkdir -p $(@D)
+
 	$(CXX) $(CXXFLAGS) -o $@ -T $^
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+-include $(DEPENDENCIES)
+
+$(BUILD_DIR)/%.o: %.cpp
+	mkdir -p $(@D)
+
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -o $@ -c $<
+
+$(BUILD_DIR)/%.o: %.s
+	mkdir -p $(@D)
+
+	$(CXX) -o $@ -c $<
 
 clean:
-	$(RM) $(TARGET) $(OBJECTS)
+	$(RM) $(BUILD_DIR)/$(TARGET) $(OBJECTS) $(DEPENDENCIES)
