@@ -19,16 +19,23 @@ stack_bottom:
 .skip 16384 # 16 kiB
 stack_top:
 
+# Entry point of the kernel
 .section .text
 .global _start
 .type _start, @function
 _start:
+    # Initialize the stack pointer
     mov $stack_top, %esp
 
+    # Low-level initialization
+    # TODO
+
+    # Enter in the high-level part of the kernel
     call kernel_main
 
+    # Halt
     cli
-1:	hlt
-	jmp 1b
+halt_loop:	hlt
+	jmp halt_loop
 
 .size _start, . - _start
