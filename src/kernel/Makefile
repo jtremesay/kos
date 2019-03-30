@@ -1,4 +1,6 @@
-ROOT_DIR = $(CURDIR)/../..
+PROJECT_DIR = $(CURDIR)
+ROOT_DIR = $(PROJECT_DIR)/../..
+BUILD_DIR = $(ROOT_DIR)/build/kernel
 
 PREFIX = i686-elf-
 AS = $(PREFIX)as
@@ -7,21 +9,18 @@ CXX =  $(PREFIX)g++
 CXXFLAGS = -nostdlib -std=c++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
 INCLUDES = -I $(ROOT_DIR)/include
 
-TARGET = kernel
-BUILD_DIR = $(ROOT_DIR)/build/$(TARGET)
+TARGET = $(BUILD_DIR)/kernel.bin
 ASM_SOURCES = \
-	boot.s
+	boot.S
 CPP_SOURCES = \
 	main.cpp
 
-OBJECTS = $(ASM_SOURCES:%.s=$(BUILD_DIR)/%.o) $(CPP_SOURCES:%.cpp=$(BUILD_DIR)/%.o)
+OBJECTS = $(ASM_SOURCES:%.S=$(BUILD_DIR)/%.o) $(CPP_SOURCES:%.cpp=$(BUILD_DIR)/%.o)
 DEPENDENCIES = $(OBJECTS:%.o=%.d)
 
 all: $(TARGET)
 
-$(TARGET): $(BUILD_DIR)/$(TARGET)
-
-$(BUILD_DIR)/$(TARGET): linker.ld $(OBJECTS)
+$(TARGET): linker.ld $(OBJECTS)
 	mkdir -p $(@D)
 
 	$(CXX) $(CXXFLAGS) -o $@ -T $^
@@ -33,13 +32,13 @@ $(BUILD_DIR)/%.o: %.cpp
 
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -o $@ -c $<
 
-$(BUILD_DIR)/%.o: %.s
+$(BUILD_DIR)/%.o: %.S
 	mkdir -p $(@D)
 
-	$(CXX) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -o $@ -c $<
 
 clean:
-	$(RM) $(BUILD_DIR)/$(TARGET) $(OBJECTS) $(DEPENDENCIES)
+	$(RM) $(TARGET) $(OBJECTS) $(DEPENDENCIES)
 
 distclean:
 	$(RM) -r $(BUILD_DIR)
